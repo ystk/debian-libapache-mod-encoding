@@ -1,0 +1,53 @@
+# Process this file with autoconf to produce a configure script.
+
+# Initilization
+AC_INIT(mod_encoding.c)
+AM_INIT_AUTOMAKE(mod_encoding, 20020611a)
+AM_CONFIG_HEADER(config.h)
+
+# mostly for developer
+AM_MAINTAINER_MODE
+
+# for debugging
+AC_MSG_CHECKING(whether to compile with debug code)
+AC_ARG_ENABLE(debug,
+[  --enable-debug           compile with debug code],
+[
+  AC_MSG_RESULT(yes)
+  CPPFLAGS="-DMOD_ENCODING_DEBUG=1 $CPPFLAGS"
+  APXSFLAGS="-Wc,-Wall $APXSFLAGS"
+])
+
+# for apxs
+AC_ARG_WITH(apxs,
+[  --with-apxs=FILE         path to apxs(1) - APache eXtenSion tool],
+[
+  if test x"$withval" = "xyes"; then
+    AC_MSG_ERROR([Please specify location of apxs])
+  fi
+  APXS="$withval"
+],
+[ APXS=apxs ])
+
+# for iconv_hook
+AC_MSG_CHECKING(whether to wrap iconv with iconv_hook)
+AC_ARG_WITH(iconv_hook,
+[  --with-iconv-hook[=DIR]  use iconv.h from iconv_hook in DIR
+                          (default is /usr/local/include/iconv_hook)],
+[
+  AC_MSG_RESULT(yes)
+  if test x"$withval" = "xyes"; then
+    APXSFLAGS="-I/usr/local/include/iconv_hook $APXSFLAGS"
+  else
+    APXSFLAGS="-I$withval $APXSFLAGS"
+  fi
+  AC_CHECK_LIB(iconv_hook, iconv_hook, [ LIBS="$LIBS -liconv_hook" ])
+])
+
+# for iconv
+AC_CHECK_LIB(iconv, iconv,    [ LIBS="$LIBS -liconv" ])
+AC_CHECK_LIB(iconv, libiconv, [ LIBS="$LIBS -liconv" ])
+
+AC_SUBST(APXS)
+AC_SUBST(APXSFLAGS)
+AC_OUTPUT(Makefile)

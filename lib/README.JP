@@ -1,0 +1,30 @@
+
+=head1 NAME
+
+  libiconv_hook - iconv の補完ライブラリ
+
+=head1 SYNOPSIS
+
+  -I/usr/local/include/iconv_hook -L/usr/local/lib -liconv_hook -liconv
+
+=head1 DESCRIPTION
+
+このライブラリは iconv では不十分な（少なくともいくつかの実装では
+不十分な）変換機能を補完し、mod_encoding ひいては mod_dav での
+日本語処理をより完全にするために用意されるものです。
+
+本文書は README と同内容ではないため、README も参照してください。
+
+=head1 NOTES
+
+本ライブラリは iconv 対応のプログラムを無変更で拡張するために、
+コンパイル時のマクロ置換による関数の差し替えを行っています。
+このため同様の置換手法を取る libiconv などと衝突することがありますが、
+その場合は iconv_hook と共にインストールされた同梱の iconv.h が
+先にサーチパスに入るようにコンパイルオプションを変更して対応して
+下さい。
+
+＃ ちなみに、libiconv はシステム付属の iconv を差し替えるために
+＃ これを行っています。
+
+=cut

@@ -1,0 +1,47 @@
+
+2002/12/9
+- Fixed a silly bug in encoding identify routine(identify_encoding.c).
+
+2002/6/6
+- Closed a hole allowing random file to be accessed.
+
+2002/3/??
+- Added code to handle WinXP's broken username problem.
+- Now uses C99 variable-length macro instead of gcc version.
+
+2001/12/11
+- Moved all modules into separate shared library (libiconv_hook).
+
+2001/10/24
+- Added custom converters from Kunio Miyamoto <wakatono@todo.gr.jp>
+  and Kazuhiko Iwama <iwama@ymc.ne.jp>.
+
+2001/10/18
+- Enhanced AddClientEncoding to take multiple encoding names.
+- Added iconv-until-success loop.
+  From Akira YOSHIYAMA <a-yoshiyama@bu.jp.nec.com>.
+- Added plug-in interface for custom converters.
+
+2001/06/26
+- Added copyright notice for easier distribution.
+
+2001/05/25
+- Release of mod_encoding, converted from mod_dav patch.
+
+2001/03/01
+- Downward update, so it will apply cleanly to stable release of
+  mod_dav, instead of current CVS snapshot.
+
+2000/11/30
+- Minor update. Added iconv(3) autodetection code to configure.in.
+
+2000/11/06
+- Added explanation on how interoperability is broken by current
+  WebDAV client implementations.
+
+2000/10/30
+- Minor update. Added some conditional macros, so mod_dav can still
+  compile in environment without iconv(3).
+
+2000/10/20
+- Release of mod_dav patch, for non-ascii filename handling.

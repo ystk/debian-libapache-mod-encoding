@@ -1,0 +1,159 @@
+
+=head1 NAME
+
+  mod_encoding - HTTP リクエストのエンコーディング変換モジュール
+
+=head1 SYNOPSIS
+
+ # in httpd.conf
+ LoadModule headers_module  libexec/mod_headers.so
+ LoadModule encoding_module libexec/mod_encoding.so
+
+ AddModule mod_headers.c
+ AddModule mod_encoding.c
+
+ <IfModule mod_headers.c>
+  Header add MS-Author-Via "DAV"
+ </IfModule>
+
+ <IfModule mod_encoding.c>
+  EncodingEngine    on
+  NormalizeUsername on
+  SetServerEncoding     UTF-8
+  DefaultClientEncoding JA-AUTO-SJIS-MS SJIS
+
+  AddClientEncoding "cadaver/" EUC-JP
+ </IfModule>
+
+=head1 DESCRIPTION 
+
+この Apache モジュールは HTTP リクエスト及びへッダに含まれる
+文字のエンコーディングを変換するものです。主に mod_dav の機能
+補完のために作成されました。
+
+現在、多くの WebDAV クライアントはファイル名をクライアント側で
+使用しているエンコーディングのまま送るという挙動を取ります。
+ところが mod_dav はすべてのデータが UTF-8 であるという前提で
+動作するために、これが相互運用上の問題を引き起こしています。
+
+この問題はおそらく将来的には RFC 等で規格を定めた上、各実装が
+それに準拠することで解消すると思われますが、それを待たずに mod_dav を
+利用可能にするために本モジュールが作成されました。
+
+=head1 REQUIREMENTS
+
+本モジュールの利用には iconv(3) が必要です。
+
+もしシステム標準の iconv がない場合（例えば *BSD 系のプラットフォーム）は、
+
+  http://clisp.cons.org/~haible/packages-libiconv.html
+
+で入手できます。上記パッケージが BSD/OS 4.1 で利用可能であることを
+確認しています。
+
+=head1 INSTALLATION
+
+単純に
+
+  $ ./configure --with-apxs=<path-to-apxs>
+  $ make
+  $ make install
+
+でビルド＋インストールできるはずです。ただ、iconv_hook を利用する場合は
+先に lib/ 以下で configure ; make; make install した上で、
+
+  ./configure --enable-debug \
+              --with-apxs=<path-to-apxs> \
+              --with-iconv-hook=<install-dir-of-iconv.h-of-iconv_hook>
+
+などとする必要があります。--enable-debug というのは問題追跡を
+楽にするためで、必須ではありません。
+
+なお、make install で失敗した場合も、mod_encoding.so を適切な
+モジュール置き場にコピーすれば問題なく使えます。
+
+一方、configure で問題がある場合は、付属の Makefile.simple を
+ベースにビルドできます。apxs というツールがあり、比較的単純な
+ビルド手順なので、ストレートに行かない場合は Makefile を直接
+使うのが人によっては見通しが良いかもしれません。
+
+最後に、configure も apxs も使えない場合はちょっと厄介です。DSO を
+頑張って作るか（本体のビルド時のコンパイルオプションなどが必要なので
+手間がかかります）、apache ごとリコンパイルで静的組込することになる
+かと思います。この場合は apache の付属文書を読み、組み込み方法を
+調べてください。
+
+=head1 CONFIGURATION
+
+このモジュールの動作設定は以下の命令で行います: EncodingEngine,
+SetServerEncoding, AddClientEncoding, DefaultClientEncoding,
+NormalizeUsername です。
+
+=over 4
+
+=item EncodingEngine (on|off)
+
+モジュールの動作を制御します。on で有効になります。
+
+=item SetServerEncoding <encoding>
+
+サーバー側でファイル名に利用されるエンコーディングを指定します。
+ファイル／フォルダへのアクセス要求がくると、ここで指定された
+エンコーディングに名前を変換した上で処理が行われます。
+
+注意点として、現在 mod_dav は UTF-8 以外のエンコーディングを
+扱えないため、別途入手可能な mod_dav の拡張パッチを併用しない
+限り、ここは UTF-8 としておくのが無難です。
+
+=item AddClientEncoding <agent-name> <encoding> [<encoding> ...]
+
+変換の際のヒントとして、各種エージェントから期待される
+エンコーディングを指定します（複数可）。
+
+通常 WebDAV クライアントは UTF-8 でリクエストを送ることが
+要求されている（少なくとも推奨されている？）ものの、現実には
+多くのクライアントが各々の動作環境で使われているローカルな
+エンコーディングでリクエストを送ってくるようです。これは
+本質的には自動判定もできないため、相互運用の障害となります。
+
+これを半自動的に判定し、部分的に解決するために、エージェント名と
+期待されるエンコーディングの名称をペアで登録します。
+
+エージェント名の指定は拡張正規表現が利用可能です。なお、.* は
+全てにマッチしてしまい判定が途中で中断してしまうので、その
+場合は DefaultClientEncoding を使ってください。
+
+=item DefaultClientEncoding <encoding> [<encoding> ...]
+
+リクエストに期待されるデフォルトのエンコーディングを
+指定します（複数可）。各々のクライアントを個別指定する
+代りに利用します。
+
+なお、UTF-8 は暗黙のデフォルトとして必ず検査するため、
+これを指定する必要はありません。
+
+=item NormalizeUsername (on|off)
+
+これは WindownXP の認証付きリソースにアクセスする際の挙動を補完する
+もので、なぜかユーザー名に付加される "hostname\" の部分を切り落とします。
+
+=back
+
+=head1 SUPPORTED ENCODINGS
+
+このモジュールは変換処理に iconv を利用しているため、その iconv が
+サポートするすべてのエンコーディング名称が指定できます。いくつかの
+iconv パッケージに含まれる iconv(1) コマンドは一覧表示オプションを
+持っているので、iconv -l などとして確認するとよいでしょう。
+
+また、同梱の iconv 拡張用ライブラリ iconv_hook を組み込んだ場合は
+以下のエンコーディングも利用可能になります。
+
+  MSSJIS
+  - 各種ある SJIS の内、マイクロソフト社の採用している SJIS です。
+
+  JA-AUTO-SJIS-MS
+  - これは自動判定機能を提供する特殊なコンバータを指定するもので、
+    UTF-8/JIS/MSSJIS/SJIS/EUC-JP を処理することができます。
+
+=cut

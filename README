@@ -1,0 +1,245 @@
+
+=head1 NAME
+
+  mod_encoding - Apache module for non-ascii filename interoperability
+
+=head1 SYNOPSIS
+
+ # in httpd.conf
+ LoadModule headers_module  libexec/mod_headers.so
+ LoadModule encoding_module libexec/mod_encoding.so
+
+ AddModule mod_headers.c
+ AddModule mod_encoding.c
+
+ <IfModule mod_headers.c>
+  Header add MS-Author-Via "DAV"
+ </IfModule>
+
+ <IfModule mod_encoding.c>
+  EncodingEngine    on
+  NormalizeUsername on
+  SetServerEncoding     UTF-8
+  DefaultClientEncoding JA-AUTO-SJIS-MS SJIS
+
+  AddClientEncoding "cadaver/" EUC-JP
+ </IfModule>
+
+=head1 DESCRIPTION 
+
+This module improves non-ascii filename interoperability of
+apache (and mod_dav).
+
+It seems many WebDAV clients send filename in its platform-local
+encoding. But since mod_dav expects everything, even HTTP request
+line, to be in UTF-8, this causes an interoperability problem.
+
+I believe this is a future issue for specification (RFC?) to
+standardize encoding used in HTTP request-line and HTTP header,
+but life would be much easier if mod_dav (and others) can handle
+various encodings sent by clients, TODAY. This module does just that.
+
+=head1 REQUIREMENTS
+
+This module requires iconv(3) support.
+
+If your system don't have it (ex. *BSD platform), try using
+iconv(3) implementation available from
+
+  http://clisp.cons.org/~haible/packages-libiconv.html
+
+This worked for me on BSD/OS 4.1.
+
+=head1 INSTALLATION
+
+Standard procedure of
+
+  $ ./configure --with-apxs=<path-to-apxs>
+  $ make
+  $ make install
+
+should work. If you fail with "make install", just copy
+created mod_encoding.so to where standard Apache DSO modules reside.
+
+Or, you can use Makefile.simple that comes with the package.
+If you have problem with configure, it is recommended to manually
+edit Makefile.simple and use apxs(1) directly, as that will make
+things much simpler.
+
+Now, if configure doesn't work and you don't have working apxs,
+you have a problem. In that case, you should probably consult
+the apache documentation and find how you can integrate a module
+into the server.
+
+=head1 CONFIGURATION
+
+This module adds following directives: EncodingEngine, SetServerEncoding,
+AddClientEncoding, DefaultClientEncoding, and NormalizeUsername.
+
+=over 4
+
+=item EncodingEngine (on|off)
+
+This directive either enables or disables this module.
+
+=item SetServerEncoding <encoding>
+
+This directive specifies encoding used by local filesystem.
+Whenever mod_dav is requested to create file or folder, its
+name will be converted into this encoding.
+
+However, since mod_dav does not (yet) supports encoding other
+than UTF-8 for local filesystem, you should better set this
+to "UTF-8", unless you have apply separately available patch
+to mod_dav.
+
+=item AddClientEncoding <agent-name> <encoding> [<encoding> ...]
+
+This is a directive to specify encoding(s) expected from each
+client implementation.
+
+Though WebDAV clients are expected (or at least recommended,
+I believe) to send every data in UTF-8 or any other properly
+detectable style, some (many?) clients seems to send data in
+non-auto-detectable, platform-local encoding, thus breaking
+interoperability.
+
+You can use extended regexp to name the agent.
+
+Note you should never use ".*" for agent name.
+In that case, use DefaultClientEncoding instead.
+
+=item DefaultClientEncoding <encoding> [<encoding> ...]
+
+This directive sets default set of encoding(s) to expect
+from various clients in general. Note you have no need
+to specify "UTF-8", as that is the implicit default.
+
+=item NormalizeUsername (on|off)
+
+This directive is introduced to support behavior of WindowsXP
+when accessing password-protected resource. For some reason,
+it prepends "hostname\" to real username, and no server can
+handle such extension. Enabling this option strips off "hostname\"
+part, so only "real" username is passed to authentication module.
+
+=back
+
+=head1 SUPPORTED ENCODINGS
+
+This module supports all encoding supported by underlying
+iconv(3) implementation. You might want to try "iconv -l",
+as it might give you the list of encoding names.
+
+Also, if you have installed and linked iconv_hook extension,
+you should be able to use following encoding names additionally:
+
+  MSSJIS
+  - This is almost same as SJIS, but is a Microsoft varient of it.
+
+  JA-AUTO-SJIS-MS
+  - This is a special converter which does autodetection between
+    UTF-8/JIS/MSSJIS/SJIS/EUC-JP. This itself does not do conversion.
+
+=head1 INFORMATIONAL NOTES
+
+This is an informational note for developers.
+
+Today, as people around the world start to exchange information in
+many languages, many protocols are now required and so beginning to
+consider to be i18n (internationalization) compliant. WebDAV is not
+the exception.
+
+WebDAV selected XML as its data exchange format, and XML is
+one of the most well-defined formats including this i18n issue.
+
+However, because past standards/implementations (ex. DNS, HTTP,
+etc.) did not care much about this issue, many HTTP/WebDAV
+clients seem to break when used in i18n (= non-ascii) environment.
+
+For WebDAV, there usually is no problem for its XML content part.
+But HTTP header part seems to be broken in many implementations.
+Here, I will describe several often observed problems with possible
+solution(s).
+
+  [Problem in PUT operation]
+
+  Consider the situation when one WebDAV client tries to save a
+  file which has non-ASCII filename. First, it sends out filename
+  in HTTP header:
+
+    PUT /<non-ascii-filename> HTTP/1.1
+
+  Current standard only asks clients not to use non-ASCII encoding
+  in HTTP header. So many clients simply url-escapes the name in
+  %xx style and get away with it (some doesn't even bother to
+  escape, which is really broken).
+
+  Now, when server receives PUT request, it'll unescape (if escaped)
+  given filename and then saves the file in that name. This is the
+  first point of interoperability problem.
+
+  As server has no idea what encoding or charset this filename belongs
+  to, it cannot apply proper conversion to make sure all filenames are
+  aligned to encoding or charset supported by server-side filesystem.
+
+  Without information on filename charset and encoding, even a simple
+  "ls" or "PROPFIND" is most likely to generate unreadable garbage.
+
+  [Problem in PROPFIND operation]
+
+  Next interoperability problem arises when response to PROPFIND
+  request is sent. As server has no idea on charset and encoding
+  used, all names will be included in XML-formatted response
+  without (or with improper) encoding information.
+
+  Obviously, as defined by XML spec, this causes XML parser used
+  at client side to abort. Even if it didn't (which means non-compliant
+  parser), the chance for client to show/handle filename correctly
+  is scarce.
+
+  [Problem in MOVE operation]
+
+  Another problem arises when client tries to rename file.
+  To rename file, client sends out request in following format:
+
+    MOVE /<old-non-ascii-filename> HTTP/1.1
+    Destination: /<new-non-ascii-filename>
+
+  This is a same problem as PUT operation problem. Client simply
+  passes filenames in its platform-local encoding (or url-escaped
+  string of that), and server just cannot handle it.
+
+  [Possible Solution]
+
+  Solution to this interoperability problem is rather straight-
+  forward. Practically there're two ways to do it:
+
+    1. Always pass charset information. You can also you charset
+       encoding scheme which contains such information by default.
+
+       With proper charset information, both client and server
+       can interoperate safely by converting encoding whenever
+       needed.
+
+    2. Always use single charset encoding, which can describe any
+       character in any language.
+
+       Though current Unicode standard has many pitfalls and has been
+       criticized by many people working on i18n issue, this is
+       obviously a faster way because you don't have to know anything
+       about charset encoding.
+
+  While XML took the way to support both schemes, many protocols (DNS,
+  HTTP, etc) seem to be going with method #2.
+
+  So if you're implementing WebDAV client/server and want to do a
+  quick hack to support i18n filename, try
+
+    a. Always convert outgoing string to UTF-8 (and url-escape
+       it whenever needed).
+    b. Always convert incoming string to platform-local encoding.
+
+  If both client and server do the same, they will be interoperable.
+
+=cut

@@ -1,0 +1,34 @@
+
+APXS = apxs -Wc,-Wall
+
+# with bundled iconv_hook extension
+# - recommended, but may not compile easily yet
+INCS = -I/usr/local/include/iconv_hook
+DEFS = -DMOD_ENCODING_DEBUG=1
+LIBS = -L/usr/local/lib -liconv_hook #-liconv
+
+# without bundled iconv_hook extension (iconv in libc or libiconv)
+#INCS = -I/usr/local/include
+#DEFS = -DMOD_ENCODING_DEBUG=1
+#LIBS = -L/usr/local/lib #-liconv
+
+RM = rm -f
+CP = cp
+
+.SUFFIXES:
+.SUFFIXES: .so .c
+
+all: mod_encoding.so
+	@echo "If possible, use of libiconv_hook in lib/ is recommended."
+
+mod_encoding.so: mod_encoding.c
+	$(APXS) -c $(DEFS) $(INCS) $< $(LIBS)
+
+install: all
+	$(APXS) -i $^
+
+clean:
+	$(RM) *.so *.o
+
+distclean: clean
+	$(RM) *~ *.old *.bak

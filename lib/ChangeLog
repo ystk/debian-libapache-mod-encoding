@@ -1,0 +1,8 @@
+2002/6/8
+- Now should compile with ./configure --with-iconv && make
+
+2002/2/27
+- Added more converters from KAJIKI Yoshihiro <kajiki@ylug.org>.
+
+2001/12/11
+- Moved all modules into separate shared library (libiconv_hook).

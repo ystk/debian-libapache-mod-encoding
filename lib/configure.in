@@ -1,0 +1,32 @@
+# Process this file with autoconf to produce a configure script.
+
+# Initilization
+AC_INIT(iconv_hook.c)
+AM_INIT_AUTOMAKE(libiconv_hook, 1.0.0)
+AM_CONFIG_HEADER(config.h)
+
+# mostly for developer
+AM_MAINTAINER_MODE
+
+# Checks for programs.
+AC_PROG_CC
+AC_PROG_MAKE_SET
+AM_PROG_CC_STDC
+AC_PROG_INSTALL
+AM_PROG_LIBTOOL
+
+# for --(with|without)-iconv
+AC_ARG_WITH(iconv,
+    [  --without-iconv         do not use iconv as a fallback converter])
+AC_MSG_CHECKING(whether to use iconv(3) as a fallback converter)
+if test x"$with_iconv" = "xno"; then
+    AC_MSG_RESULT(no)
+else
+    AC_MSG_RESULT(yes)
+    AC_DEFINE(WITH_ICONV)
+    AC_CHECK_HEADERS(iconv.h)
+    AC_CHECK_LIB(iconv,    iconv, [ LIBS="$LIBS -liconv" ])
+    AC_CHECK_LIB(iconv, libiconv, [ LIBS="$LIBS -liconv" ])
+fi
+
+AC_OUTPUT(Makefile)
