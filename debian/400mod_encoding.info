@@ -1,0 +1,8 @@
+LoadModule: encoding_module /usr/lib/apache/1.3/mod_encoding.so
+Directives:
+ EncodingEngine
+ SetServerEncoding
+ AddClientEncoding
+ DefaultClientEncoding
+ NormalizeUsername
+Description: apache module for non-ascii filename interoperability

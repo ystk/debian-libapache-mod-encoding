@@ -1,0 +1,91 @@
+libapache-mod-encoding (0.0.20021209-10) unstable; urgency=low
+
+  * Libtool script updated for libiconv-hook (Closes: #306807)
+
+ -- Tatsuki Sugiura <sugi@nemui.org>  Sat, 25 Aug 2007 11:20:09 +0900
+
+libapache-mod-encoding (0.0.20021209-9) unstable; urgency=low
+
+  * The module for apache1 has been removed.  (Closes: #429121, #429539)
+  * Libtool script updated (Closes: #306807)
+  * Section was changed to net.
+
+ -- Tatsuki Sugiura <sugi@nemui.org>  Sun, 22 Jan 2006 15:32:52 +0900
+
+libapache-mod-encoding (0.0.20021209-8) unstable; urgency=low
+
+  * Nothing was changed, but upload with upstream source
+    to cancel 0.0.20021209-7.
+
+ -- Tatsuki Sugiura <sugi@nemui.org>  Tue, 17 Jan 2006 17:16:59 +0900
+
+libapache-mod-encoding (0.0.20021209-7) unstable; urgency=low
+
+  * update build scripts by new libtool (Closes: #306807)
+
+ -- Tatsuki Sugiura <sugi@nemui.org>  Tue, 17 Jan 2006 16:56:03 +0900
+
+libapache-mod-encoding (0.0.20021209-6.1) unstable; urgency=high
+
+  * Non-maintainer upload.
+  * Bug fix: "doesn't clean up properly" (Closes: #308374).
+
+ -- Frank Lichtenheld <djpig@debian.org>  Sat, 14 May 2005 01:38:08 +0200
+
+libapache-mod-encoding (0.0.20021209-6) unstable; urgency=low
+
+  * iconv_hook: fix; memory leak patch has been applied
+
+ -- Tatsuki Sugiura <sugi@nemui.org>  Sat,  1 May 2004 16:31:16 +0900
+
+libapache-mod-encoding (0.0.20021209-5) unstable; urgency=low
+
+  * Dependency was fixed (apache-common for modules-config)
+
+ -- Tatsuki Sugiura <sugi@nemui.org>  Wed,  7 Apr 2004 05:15:37 +0900
+
+libapache-mod-encoding (0.0.20021209-4) unstable; urgency=low
+
+  * fixed that libiconv_hook was not used.
+
+ -- Tatsuki Sugiura <sugi@nemui.org>  Sun, 25 Jan 2004 18:53:48 +0900
+
+libapache-mod-encoding (0.0.20021209-3) unstable; urgency=low
+
+  * strict config patch was applied.
+  * fix in module-config target.
+
+ -- Tatsuki Sugiura <sugi@nemui.org>  Mon, 19 Jan 2004 10:00:53 +0900
+
+libapache-mod-encoding (0.0.20021209-2) unstable; urgency=low
+
+  * change to new apache module style
+
+ -- Tatsuki Sugiura <sugi@nemui.org>  Sun,  4 Jan 2004 21:52:55 +0900
+
+libapache-mod-encoding (0.0.20021209-1) unstable; urgency=low
+
+  * New upstream release
+  * safe query patch applied (Closes: #176804)
+
+ -- Tatsuki Sugiura <sugi@nemui.org>  Fri, 17 Jan 2003 21:05:32 +0900
+
+libapache-mod-encoding (0.0.20020611a-3) unstable; urgency=low
+
+  * supported apache-ssl in postinst script.
+
+ -- Tatsuki Sugiura <sugi@nemui.org>  Fri, 16 Aug 2002 09:03:19 +0900
+
+libapache-mod-encoding (0.0.20020611a-2) unstable; urgency=low
+
+  * rebuilded for db1 has gone.
+  * maintener has been changed.
+
+ -- Tatsuki Sugiura <sugi@nemui.org>  Thu, 15 Aug 2002 07:44:03 +0900
+
+libapache-mod-encoding (0.0.20020611a-1) unstable; urgency=low
+
+  * Initial Release. (Closes: #150914)
+
+ -- Tatsuki Sugiura <sugi@nemui.org>  Wed, 19 Jun 2002 04:19:25 +0900
+

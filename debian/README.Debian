@@ -1,0 +1,14 @@
+libapahce-mod-encoding for Debian
+------------
+
+Configuration tips:
+
+  * Encoding configuration dose not work in <Directory> directive.
+    You should write config in top level or <Virtualhost> directive.
+
+  * mod_encoding dose not work with UserDir.
+    You must use under DocumentRoot.
+
+  * SetServerEncoding must be UTF-8 unless you use patched mod_dav.
+
+ -- Tatsuki Sugiura <sugi@nemui.org>, Tue Jan 13 06:17:09 2004

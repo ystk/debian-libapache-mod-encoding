@@ -1,0 +1,33 @@
+Written by Tatsuki Sugiura <sugi@nemui.org>.
+All rigthts was renounced. you can treat this as public domain.
+--- mod_encoding.orig/mod_encoding.c	2004-01-13 04:50:24.000000000 +0900
++++ mod_encoding/mod_encoding.c	2004-01-13 04:55:51.000000000 +0900
+@@ -314,23 +314,23 @@
+ static const command_rec mod_enc_commands[] = {
+   {"EncodingEngine",
+    set_encoding_engine, NULL,
+-   OR_ALL, FLAG,  "Usage: EncodingEngine (on|off)"},
++   RSRC_CONF, FLAG,  "Usage: EncodingEngine (on|off)"},
+ 
+   {"SetServerEncoding",
+    set_server_encoding, NULL,
+-   OR_ALL, TAKE1, "Usage: SetServerEncoding <enc>"},
++   RSRC_CONF, TAKE1, "Usage: SetServerEncoding <enc>"},
+ 
+   {"AddClientEncoding",
+    add_client_encoding, NULL,
+-   OR_ALL, RAW_ARGS, "Usage: AddClientEncoding <agent> <enc> [<enc> ...]"},
++   RSRC_CONF, RAW_ARGS, "Usage: AddClientEncoding <agent> <enc> [<enc> ...]"},
+ 
+   {"DefaultClientEncoding",
+    default_client_encoding, NULL,
+-   OR_ALL, RAW_ARGS, "Usage: DefaultClientEncoding <enclist>"},
++   RSRC_CONF, RAW_ARGS, "Usage: DefaultClientEncoding <enclist>"},
+ 
+   {"NormalizeUsername",
+    set_normalize_username, NULL,
+-   OR_ALL, FLAG, "Usage: NormalizeUsername (on|off)"},
++   RSRC_CONF|ACCESS_CONF, FLAG, "Usage: NormalizeUsername (on|off)"},
+ 
+   {NULL}
+ };

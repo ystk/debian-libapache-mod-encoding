@@ -1,0 +1,4 @@
+version=2
+http://webdav.todo.gr.jp/download/ \
+	(?:./|/download/|)mod_encoding-(.*)\.tar\.gz \
+	debian uupdate

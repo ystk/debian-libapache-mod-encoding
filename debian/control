@@ -1,0 +1,43 @@
+Source: libapache-mod-encoding
+Section: net
+Priority: optional
+Maintainer: Tatsuki Sugiura <sugi@nemui.org>
+Build-Depends: debhelper (>> 3.0.0)
+Standards-Version: 3.7.2.2
+Uploaders: TAKU Yasui <tach@debian.or.jp>
+
+Package: libiconv-hook1
+Section: libs
+Architecture: any
+Depends: ${shlibs:Depends}
+Description: extension of iconv for libapache-mod-encoding
+ This code is iconv compatible interface routine for mod_encoding.
+ Taisuke Yamada writes sample code for hooking iconv() for mod_encoding.
+ .
+ In mod_encoding configuration directive,
+ supports following encoding names additionally:
+ .
+  MSSJIS
+  - This is almost same as SJIS, but is a Microsoft variant of it.
+ .
+  JA-AUTO-SJIS-MS
+  - This is a special converter which does autodetection between
+    UTF-8/JIS/MSSJIS/SJIS/EUC-JP. This itself does not do conversion.
+
+Package: libiconv-hook-dev
+Architecture: any
+Depends: libiconv-hook1 (= ${binary:Version})
+Section: libdevel
+Description: header files of libiconv-hook
+ This code is iconv compatible interface routine for mod_encoding.
+ Taisuke Yamada writes sample code for hooking iconv() for mod_encoding.
+ .
+ In mod_encoding configuration directive,
+ supports following encoding names additionally:
+ .
+  MSSJIS
+  - This is almost same as SJIS, but is a Microsoft variant of it.
+ .
+  JA-AUTO-SJIS-MS
+  - This is a special converter which does autodetection between
+    UTF-8/JIS/MSSJIS/SJIS/EUC-JP. This itself does not do conversion.
